@@ -1,10 +1,8 @@
 '''
-So, how to describe a chessboard?
-Obviously I use an nested array.
-[[],[],[],[],[],[],[],[]]
-So I have that.
-Now I need to decide between using objects to represent pieces, which is a lot simpler, or using a 'bitboard', which would probably be shorter
-but less idiomatic
+By Thomas Neil 2017
+A simple, unoptimized chess engine
+that is designed for PvP and training.
+https://github.com/Thomas-Neill/python-chess
 '''
 class Piece:
     def __init__(self,location,color):

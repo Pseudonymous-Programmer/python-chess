@@ -186,16 +186,6 @@ def findLegalMoves(location,board):
             ret.append(move)
     return(ret)
                     
-def newBoard(move,board):
-    '''
-    Takes a "move" tuple formatted like this:
-    Location, Location that piece is to be moved to
-    '''
-    cpBoard = board[:]
-    piece = board[move[0][1]][move[0][0]]
-    cpBoard[move[1][1]][move[1][0]] = piece
-    cpBoard[move[0][1]][move[0][0]] = Empty()
-    return(cpBoard)
 
 def add(coord1,coord2):
     '''

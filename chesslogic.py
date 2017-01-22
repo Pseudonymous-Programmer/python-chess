@@ -4,7 +4,6 @@ A simple, unoptimized chess engine
 that is designed for PvP and training.
 https://github.com/Thomas-Neill/python-chess
 '''
-from textio import *
 class Piece:
     def __init__(self,location,color):
         self.location = location
@@ -207,8 +206,4 @@ STARTINGBOARD = [
     [Pawn((i,6),False) for i in range(8)],
     [Rook((0,7),False),Knight((1,7),False),Bishop((2,7),False),Queen((3,7),False),King((4,7),False),Bishop((5,7),False),Knight((6,7),False),Rook((7,7),False)]
     ]
-if(__name__ == '__main__'):
-    print('Debugging!')
-    printBoard(STARTINGBOARD,True)
-    print(findLegalMoves((0,1),STARTINGBOARD))
     

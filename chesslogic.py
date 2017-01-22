@@ -4,6 +4,7 @@ A simple, unoptimized chess engine
 that is designed for PvP and training.
 https://github.com/Thomas-Neill/python-chess
 '''
+from textio import *
 class Piece:
     def __init__(self,location,color):
         self.location = location

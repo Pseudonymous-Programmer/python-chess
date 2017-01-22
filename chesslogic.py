@@ -4,7 +4,18 @@ A simple, unoptimized chess engine
 that is designed for PvP and training.
 https://github.com/Thomas-Neill/python-chess
 '''
-class Piece:
+class Square:
+    def __init__(self,location):
+        self.occupied = False
+        self.location = location
+    def isAttacked(self,board,white): #is this square attacked by pieces of color X?
+        otherPieces = filterPieces(board,lambda piece: piece.white != white)
+        for piece in otherPieces:
+            if(self.location in piece.generateMoves(board)):
+                return(True)
+        return(False)
+    
+class Piece(Square): #inheirits isAttacked function
     def __init__(self,location,color):
         self.location = location
         self.white = color
@@ -33,9 +44,6 @@ class Piece:
         return(seq)
 
 
-class Empty:
-    def __init__(self):
-        self.occupied = False
 
 
 class Rook(Piece):
@@ -55,7 +63,7 @@ class Rook(Piece):
         return(ret)
 
 
-class Bishop(Piece): #reusable code,bruh
+class Bishop(Piece):d
     def generateMoves(self,board):
         ret = []
         movePatterns = [(1,1),(-1,1),(-1,-1),(1,-1)]
@@ -145,11 +153,7 @@ class King(Piece):
                     ret.append(test)
         return(ret)
     def isChecked(self,board):
-        otherPieces = filterPieces(board,lambda piece: piece.white != self.white)
-        for piece in otherPieces:
-            if(self.location in piece.generateMoves(board)):
-                return(True)
-        return(False)
+        return(self.isAttacked(board,self.color))
 
 def filterPieces(board,lmbda):
     ret = []
@@ -163,13 +167,37 @@ def filterPieces(board,lmbda):
 def do(move,board):
     '''
     Moves are [PieceLocation,PieceDestination]
+    or [-1,[color,side]] for castles
     '''
     copy = board[:]
-    location,destination = move #unwraps the move a little
-    copy[destination[1]][destination[0]] = copy[location[1]][location[0]]
-    copy[location[1]][location[0]]  = Empty()
+    if(move[0] == -1):
+        castle(move[1][1],move[1][0],copy)
+    else:
+        location,destination = move #unwraps the move a little
+        copy[destination[1]][destination[0]] = copy[location[1]][location[0]]
+        copy[destination[1]][destination[0]].move((location[0],location[1]))
+        copy[location[1]][location[0]]  = Square((location[0],location[1]))
     return(copy)
 
+def validCastles(color,board):
+    rank = 0 if color else 7
+    pass
+def castle(color,side,board):
+    '''
+    True is queenside,
+    false is kingside
+    '''
+    rank = 0 if color else 7
+    if(side):
+        board = do([(4,rank),(2,rank)],board)
+        board = do([(0,rank),(3,rank)],board)
+    else:
+        board[rank][6] = board[rank][4]
+        board[rank][3].move((4,rank))                    
+        board[rank][4] = Square((4,rank))
+        board[rank][5] = board[rank][7]
+        board[rank][3].move((7,rank))
+        board[rank][7] = Square((7,rank))
 
 def findLegalMoves(location,board):
     piece = board[location[1]][location[0]]
@@ -196,13 +224,20 @@ def add(coord1,coord2):
             return(None)
     return(ret)
 
+def allValidMoves(color,board):
+    pieces = filterPieces(board,lambda piece: piece.color == color)
+    ret = []
+    for piece in pieces:
+        ret += findLegalMoves(piece.location,board)
+    return(ret)
+
 STARTINGBOARD = [
     [Rook((0,0),True),Knight((1,0),True),Bishop((2,0),True),Queen((3,0),True),King((4,0),True),Bishop((5,0),True),Knight((6,0),True),Rook((7,0),True)],
     [Pawn((i,1),True) for i in range(8)],
-    [Empty() for i in range(8)],
-    [Empty() for i in range(8)],
-    [Empty() for i in range(8)],
-    [Empty() for i in range(8)],
+    [Square((i,2)) for i in range(8)],
+    [Square((i,3)) for i in range(8)],
+    [Square((i,4)) for i in range(8)],
+    [Square((i,5)) for i in range(8)],
     [Pawn((i,6),False) for i in range(8)],
     [Rook((0,7),False),Knight((1,7),False),Bishop((2,7),False),Queen((3,7),False),King((4,7),False),Bishop((5,7),False),Knight((6,7),False),Rook((7,7),False)]
     ]

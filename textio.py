@@ -16,9 +16,7 @@ def dispBoard(board,perspective):
         column = board[y]
         pending = ''
         for x,piece in enumerate(column):
-            if(isinstance(piece,Empty)):
-                pending += chars[0][(x+y)%2==0]
-            elif(isinstance(piece,King)):
+            if(isinstance(piece,King)):
                 pending += chars[1][not piece.white]
             elif(isinstance(piece,Queen)):
                 pending += chars[2][not piece.white]
@@ -30,5 +28,7 @@ def dispBoard(board,perspective):
                 pending += chars[5][not piece.white]
             elif(isinstance(piece,Pawn)):
                 pending += chars[6][not piece.white]
+            else:
+                pending += chars[0][(x+y)%2==0]
             pending += ' '
         print(pending)

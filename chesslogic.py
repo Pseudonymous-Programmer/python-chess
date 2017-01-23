@@ -4,12 +4,18 @@ A simple, unoptimized chess engine
 that is designed for PvP and training.
 https://github.com/Thomas-Neill/python-chess
 '''
+WHITE = True
+BLACK = False
+QUEENSIDE = True
+KINGSIDE = False
+A,B,C,D,E,F,G,H = 0,1,2,3,4,5,6,7 #useful constants
 class Square:
     def __init__(self,location):
         self.occupied = False
         self.location = location
+        self.moved = True
     def isAttacked(self,board,white): #is this square attacked by pieces of color X?
-        otherPieces = filterPieces(board,lambda piece: piece.white != white)
+        otherPieces = filterPieces(board,lambda piece: piece.white == white)
         for piece in otherPieces:
             if(self.location in piece.generateMoves(board)):
                 return(True)
@@ -63,7 +69,7 @@ class Rook(Piece):
         return(ret)
 
 
-class Bishop(Piece):d
+class Bishop(Piece):
     def generateMoves(self,board):
         ret = []
         movePatterns = [(1,1),(-1,1),(-1,-1),(1,-1)]
@@ -181,7 +187,37 @@ def do(move,board):
 
 def validCastles(color,board):
     rank = 0 if color else 7
-    pass
+    attackLambda = lambda square: square.isAttacked(board,not color) #is this square attacked by pieces of the opposing color?
+    occupyLambda = lambda square: square.occupied #is this square occupied
+    ret = []
+    valid = True
+    kingSpot = board[rank][E]
+    if(isinstance(kingSpot,King) and not kingSpot.moved):
+        QueenRook = board[rank][A]
+        if(isinstance(QueenRook,Rook) and not QueenRook.moved):
+            valid = True
+            for file in range(B,E):
+                if(occupyLambda(board[rank][file])):
+                    valid = False
+            for file in range(A,F):
+                if(attackLambda(board[rank][file])):
+                    valid = False
+            if(valid):
+                ret.append(QUEENSIDE)
+        KingRook = board[rank][H]
+        if(isinstance(KingRook,Rook) and not KingRook.moved):
+            valid = True
+            for file in range(F,H):
+                if(occupyLambda(board[rank][file])):
+                    valid = False
+            for file in range(E,H+1):
+                if(attackLambda(board[rank][file])):
+                    valid = False
+            if(valid):
+                   ret.append(KINGSIDE)
+    return(ret)
+    
+    
 def castle(color,side,board):
     '''
     True is queenside,
@@ -189,15 +225,12 @@ def castle(color,side,board):
     '''
     rank = 0 if color else 7
     if(side):
-        board = do([(4,rank),(2,rank)],board)
-        board = do([(0,rank),(3,rank)],board)
+        board = do([(E,rank),(C,rank)],board)
+        board = do([(A,rank),(D,rank)],board)
     else:
-        board[rank][6] = board[rank][4]
-        board[rank][3].move((4,rank))                    
-        board[rank][4] = Square((4,rank))
-        board[rank][5] = board[rank][7]
-        board[rank][3].move((7,rank))
-        board[rank][7] = Square((7,rank))
+        board = do([(E,rank),(G,rank)],board)
+        board = do([(H,rank),(F,rank)],board)
+    return(board)
 
 def findLegalMoves(location,board):
     piece = board[location[1]][location[0]]

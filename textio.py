@@ -63,7 +63,13 @@ def getMove(board,coords):
         for castle in castles:
             print(["Queenside castle available (type Q)","Kingside castle available (type K)"][castle])
     print("Valid squares:")
-    moves = findLegalMoves(piece)
-    for move in moves:
-        printLocation(move)
-    valid = False
+    moves = findLegalMoves(coords,board)
+    squares = [printLocation(i) for i in moves]
+    for square in squares:
+        print(square)
+    while(True):
+        inp = input("Choose a valid move: ")
+        if(inp == 'K' or inp == 'Q'):
+            return([-1,[piece.white,inp=='Q']])
+        elif(inp in squares):
+            return([coords,moves[squares.index(inp)]])

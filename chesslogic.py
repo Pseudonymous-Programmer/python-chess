@@ -4,6 +4,7 @@ A simple, unoptimized chess engine
 that is designed for PvP and training.
 https://github.com/Thomas-Neill/python-chess
 '''
+import copy as c
 WHITE = True
 BLACK = False
 QUEENSIDE = True
@@ -48,59 +49,38 @@ class Piece(Square): #inheirits isAttacked function
                 else:
                     return(seq[:key+1:])
         return(seq)
+    def raycast(self,board,movePatterns):
+        ret = []
+        for i in movePatterns:
+            line = []
+            location = self.location
+            while(True):
+                location = add(i,location)
+                if(location is not None):
+                    line.append(location)
+                else:
+                    break
+            ret += self.snip(line,board)
+        return(ret)
 
 
 
 
 class Rook(Piece):
+    movePatterns = [(1,0),(0,1),(-1,0),(0,-1)]
     def generateMoves(self,board):
-        ret = []
-        movePatterns = [(1,0),(0,1),(-1,0),(0,-1)]
-        for i in range(4):
-            line = []
-            location = self.location
-            while(True):
-                location = add(movePatterns[i],location)
-                if(location is not None):
-                    line.append(location)
-                else:
-                    break
-            ret += self.snip(line,board)
-        return(ret)
-
+        return(self.raycast(board,self.movePatterns))
 
 class Bishop(Piece):
+    movePatterns = [(1,1),(-1,1),(-1,-1),(1,-1)]
     def generateMoves(self,board):
-        ret = []
-        movePatterns = [(1,1),(-1,1),(-1,-1),(1,-1)]
-        for i in range(4):
-            line = []
-            location = self.location
-            while(True):
-                location = add(movePatterns[i],location)
-                if(location is not None):
-                    line.append(location)
-                else:
-                    break
-            ret += self.snip(line,board)
-        return(ret)
+        return(self.raycast(board,self.movePatterns))
 
 
 class Queen(Piece):
+    movePatterns = [(1,0),(0,1),(-1,0),(0,-1),(1,1),(-1,1),(-1,-1),(1,-1)]
     def generateMoves(self,board):
-        ret = []
-        movePatterns = [(1,0),(0,1),(-1,0),(0,-1),(1,1),(-1,1),(-1,-1),(1,-1)]
-        for i in range(4):
-            line = []
-            location = self.location
-            while(True):
-                location = add(movePatterns[i],location)
-                if(location is not None):
-                    line.append(location)
-                else:
-                    break
-            ret += self.snip(line,board)
-        return(ret)
+        return(self.raycast(board,self.movePatterns))#I could have even put this into the piece class, but that would be codegolfing more than DRY
 
 class Knight(Piece):
     def generateMoves(self,board):
@@ -159,7 +139,7 @@ class King(Piece):
                     ret.append(test)
         return(ret)
     def isChecked(self,board):
-        return(self.isAttacked(board,self.color))
+        return(self.isAttacked(board,self.white))
 
 def filterPieces(board,lmbda):
     ret = []
@@ -175,7 +155,7 @@ def do(move,board):
     Moves are [PieceLocation,PieceDestination]
     or [-1,[color,side]] for castles
     '''
-    copy = board[:]
+    copy = c.deepcopy(board)
     if(move[0] == -1):
         castle(move[1][1],move[1][0],copy)
     else:

@@ -21,7 +21,7 @@ class Square:
             if(self.location in piece.generateMoves(board)):
                 return(True)
         return(False)
-    
+
 class Piece(Square): #inheirits isAttacked function
     def __init__(self,location,color):
         self.location = location
@@ -123,7 +123,7 @@ class Pawn(Piece):
                     if(piece.white != self.white):
                         ret.append(move)
         return(ret)
-    
+
 class King(Piece):
     def generateMoves(self,board):
         movePatterns = [(-1,-1),(-1,0),(-1,1),(0,1),(1,1),(1,0),(1,-1),(0,-1)]
@@ -196,8 +196,8 @@ def validCastles(color,board):
             if(valid):
                    ret.append(KINGSIDE)
     return(ret)
-    
-    
+
+
 def castle(color,side,board):
     '''
     True is queenside,
@@ -222,10 +222,10 @@ def findLegalMoves(location,board):
         if(not filterPieces(testBoard,
                             lambda piece: piece.white == color and isinstance(piece,King)
                             )[0].isChecked(board)):
-            
+
             ret.append(move)
     return(ret)
-                    
+
 
 def add(coord1,coord2):
     '''
@@ -244,6 +244,29 @@ def allValidMoves(color,board):
         ret += findLegalMoves(piece.location,board)
     return(ret)
 
+def checkEnPassant(board,move):
+    location = move[0]
+    destination = move[1]
+    piece = board[location[1]][location[0]]
+    ret = []
+    if(isinstance(piece,Pawn)): #is it a pawn
+        if(not piece.moved): #who hasn't moved yet
+            direction = 1 if piece.white else -1
+            if(add(location,(0,2*direction)) == destination): #but now is moving two squares
+                rank = 3 if piece.white else 4 #rank enemy pawns need to be on
+                files = [location[0]-1,location[0]+1] #files they need to be on
+                for key,file in enumerate(files):
+                    try:
+                        if(isinstance(board[rank][file],Pawn) and #is the board at that spot
+                           board[rank][file].white != piece.white): #a pawn, and is it 'evil'?
+                           copy = c.deepcopy(board)
+                           copy[location[1]][location[0]] = Square(location) #the pawn dies
+                           copy = do([(file,rank),(location[0],location[1]+direction)],copy)
+                           ret.append([bool(key),copy])
+                    except IndexError:
+                        pass #catches bad files - not very good programming, but it's easy
+    return(ret)
+    
 STARTINGBOARD = [
     [Rook((0,0),True),Knight((1,0),True),Bishop((2,0),True),Queen((3,0),True),King((4,0),True),Bishop((5,0),True),Knight((6,0),True),Rook((7,0),True)],
     [Pawn((i,1),True) for i in range(8)],
@@ -254,4 +277,3 @@ STARTINGBOARD = [
     [Pawn((i,6),False) for i in range(8)],
     [Rook((0,7),False),Knight((1,7),False),Bishop((2,7),False),Queen((3,7),False),King((4,7),False),Bishop((5,7),False),Knight((6,7),False),Rook((7,7),False)]
     ]
-    

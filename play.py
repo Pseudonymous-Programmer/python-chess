@@ -18,7 +18,7 @@ def checkEnPassant(board,move):
             direction = 1 if piece.white else -1
             if(add(location,(0,2*direction)) == destination): #but now is moving two squares
                 rank = 3 if piece.white else 4 #rank enemy pawns need to be on
-                files = [location[0]-1.location[0]+1] #files they need to be on
+                files = [location[0]-1,location[0]+1] #files they need to be on
                 for key,file in enumerate(files):
                     try:
                         if(isinstance(board[rank][file],Pawn) and #is the board at that spot
@@ -31,7 +31,7 @@ def checkEnPassant(board,move):
                         pass #catches bad files - not very good programming, but it's easy
     return(ret)
 blankBoard = [
-[ Square(i,j) for i in range(8)]
+[ Square((i,j)) for i in range(8)]
 for j in range(8)
 ]
-dispBoard(blankBoard)
+dispBoard(blankBoard,WHITE)

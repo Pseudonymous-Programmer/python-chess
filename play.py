@@ -1,18 +1,33 @@
 '''
-Runs the chess board and has high-level logic for
+Runs the chess game and has high-level logic for
 promotion
 '''
 from textio import *
 from chesslogic import * #not needed, but makes dependencies clear
-def getPlayerMove(board,color):
-    location = choosePiece(board,color)
-    move = getMove(board,location)
-    return(move)
-blankBoard = [[ Square((i,j)) for i in range(8)]for j in range(8)]
-blankBoard[6][E] = Pawn((E,6),BLACK)
-blankBoard[0][E] = King((E,0),BLACK)
-blankBoard[4][D] = Pawn((D,4),WHITE)
-blankBoard[4][F] = Pawn((F,4),WHITE)
-move = getPlayerMove(blankBoard,BLACK)
-dispBoard(checkEnPassant(blankBoard,move)[0][1],BLACK)
-dispBoard(checkEnPassant(blankBoard,move)[1][1],BLACK)
+def playChess(): #yay!
+    board = STARTINGBOARD
+    currentPlayer = WHITE
+    while(True):
+        if(isCheckmated(board,currentPlayer)):
+            return(not currentPlayer)
+        elif(isStalemated(board,currentPlayer)):
+            return(None)
+        move = getPlayerMove(board,currentPlayer)
+        board = do(move,board)
+        if(checkPromotion(board,currentPlayer)):
+            location = checkPromotion(board,currentPlayer)
+            piece = getPieceType()
+            board = promote(board,location,piece)
+        if(checkEnPassant(board,move)):
+            passants = checkEnPassant(board,move)
+            choice = promptEnPassant(passants)
+            if(choice is not None):
+                board = doEnPassant(board,move,choice,not currentPlayer)
+                continue
+        currentPlayer = not currentPlayer
+if(__name__ == '__main__'):
+    result = playChess()
+    if(result is not None):
+        print("Congradulations {} player!".format(["black","white"][result]))
+    else:
+        print("Tie! Good game!")

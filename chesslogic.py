@@ -1,8 +1,8 @@
 """
-By Thomas Neil 2017
+By PP 2017
 A simple, unoptimized chess engine
 that is designed for PvP and training.
-https://github.com/Thomas-Neill/python-chess
+https://github.com/Pseudonynomyous-Programmer/python-chess
 """
 import copy as c
 

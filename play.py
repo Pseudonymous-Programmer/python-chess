@@ -2,9 +2,9 @@
 Runs the chess game and has high-level logic for
 promotion
 '''
-from textio import *
+from GUIio import *
 from chesslogic import * #not needed, but makes dependencies clear
-def playChess(): #yay!
+def playChess():
     board = STARTINGBOARD
     currentPlayer = WHITE
     while(True):
@@ -31,3 +31,4 @@ if(__name__ == '__main__'):
         print("Congradulations {} player!".format(["black","white"][result]))
     else:
         print("Tie! Good game!")
+    quit()
